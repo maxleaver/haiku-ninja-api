@@ -6,10 +6,6 @@ namespace Tests\Bootstrap;
 class LocalWebTestCase extends \There4\Slim\Test\WebTestCase
 {
     public function getSlimInstance() {
-      // Load env variables
-      $dotenv = new \Dotenv\Dotenv(__DIR__ . '/../');
-      $dotenv->load();
-
       // Instantiate the app
       $settings = require __DIR__ . '/../app/settings.php';
       $app = new \Slim\App($settings);
