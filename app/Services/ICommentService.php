@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-interface CommentService
+interface ICommentService
 {
-    public function fetchComments($for, $next);
+    public function request($for, $next);
     public function getComments();
     public function getNextPageToken();
     public function getCommentsSearched();

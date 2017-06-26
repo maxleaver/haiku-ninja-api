@@ -2,49 +2,69 @@
 
 namespace App\Services;
 
+use Google_Client;
+use Google_Service_YouTube;
 use App\Models\Comment;
+use App\Services\ICommentService;
 
-class YoutubeCommentService implements CommentService {
-    protected $youtube;
-    protected $part = 'snippet';
-    protected $textFormat = 'plainText';
-    protected $maxResults = 100;
-    protected $comments = array();
+class YoutubeCommentService implements ICommentService
+{
+    protected $service;
+
+    protected $comments = [];
     protected $commentsSearched = 0;
     protected $nextPageToken;
 
-    public function __construct(YoutubeClient $client)
+    public function __construct($service = null)
     {
-        $this->youtube = $client;
+        $this->service = $service;
+
+        if (is_null($this->service)) {
+            $this->service = $this->getService();
+        }
+    }
+
+    /**
+     * Returns an instance of the YouTube API service
+     * @return Google_Service_YouTube     Google YouTube API Service
+     */
+    protected function getService()
+    {
+        // Instantiate Google API Client
+        $client = new Google_Client();
+        $client->setApplicationName(getenv('APP_NAME'));
+        $client->setDeveloperKey(getenv('GOOGLE_API_KEY'));
+
+        // Instantiate YouTube Service
+        return new Google_Service_YouTube($client);
     }
 
     /**
      * Request comments from the YouTube API
      * @param  string $id            YouTube Video ID
      * @param  string $nextPageToken Token for page of results
-     * @return array                 Array of Comment objects
+     * @return array                 Array of Comments
      */
-    public function fetchComments($id, $nextPageToken = NULL)
+    public function request($id, $nextPageToken = NULL)
     {
         // Set parameters for YouTube API request
-        $params = array(
+        $params = [
             'videoId' => $id,
-            'textFormat' => $this->textFormat,
-            'maxResults' => $this->maxResults,
+            'textFormat' => 'plainText',
+            'maxResults' => 100,
             'pageToken' => $nextPageToken
-        );
+        ];
 
         // Request comments from the YouTube API
-        $results = $this->youtube->comments($this->part, $params);
+        $response = $this->service->commentThreads->listCommentThreads('snippet', $params);
 
-        if (isset($results->items)) {
+        if (isset($response->items)) {
             // Set all the object properties
-            $this->setNextPageToken($results->nextPageToken);
-            $this->setCommentsSearched(count($results->items));
-            $this->setComments($results->items);
+            $this->setComments($response->items);
+            $this->setNextPageToken($response->nextPageToken);
         }
 
-        return $this->comments;
+        return $this->getComments();
     }
 
     /**
@@ -55,9 +75,7 @@ class YoutubeCommentService implements CommentService {
     {
         foreach ($items as $item) {
             // Parse through YouTube API response and build Comment objects
-            if (isset($item->snippet) &&
-                isset($item->snippet->topLevelComment) &&
-                isset($item->snippet->topLevelComment->snippet)) {
+            if (isset($item->snippet->topLevelComment->snippet)) {
                 $data = $item->snippet->topLevelComment->snippet;
                 $comment = new Comment($data->textDisplay, $data->authorDisplayName, $data->authorProfileImageUrl);
 
@@ -65,11 +83,13 @@ class YoutubeCommentService implements CommentService {
                 array_push($this->comments, $comment);
             }
         }
+
+        $this->setCommentsSearched();
     }
 
     /**
-     * Return array of comments
-     * @return array Array of comment objects
+     * Returns the array of Comments
+     * @return array Array of Comments
      */
     public function getComments()
     {
@@ -96,11 +116,11 @@ class YoutubeCommentService implements CommentService {
 
     /**
      * Set the number of comments searched
-     * @param int $count Comments searched
+     * @param array $items Array of Comments
      */
-    protected function setCommentsSearched($count)
+    protected function setCommentsSearched()
     {
-        $this->commentsSearched = $count;
+        $this->commentsSearched = count($this->comments);
     }
 
     /**

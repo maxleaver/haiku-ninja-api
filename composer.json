@@ -18,15 +18,15 @@
         "monolog/monolog": "^1.17",
         "maxleaver/php-haiku": "1.*",
         "google/apiclient": "^2.0",
-        "tuupola/slim-jwt-auth": "^2.3",
         "vlucas/phpdotenv": "^2.4"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=4.8 < 6.0"
+        "phpunit/phpunit": ">=4.8 < 6.0",
+        "there4/slim-test-helpers": "^2.1"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\": "app/"
         }
     },
     "autoload-dev": {

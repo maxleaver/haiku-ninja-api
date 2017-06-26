@@ -11,25 +11,58 @@ class YoutubeCommentServiceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->stub = $this
-            ->getMockBuilder('App\Services\YoutubeClient')
-            ->disableOriginalConstructor()
-            ->setMethods(['comments'])
-            ->getMock();
+        $this->stub = $this->createMock('Google_Service_YouTube');
+        $this->stub->commentThreads = $this->createMock('Google_Service_YouTube_Resource_CommentThreads');
 
         $this->service = new YoutubeCommentService($this->stub);
     }
 
     /** @test */
-    public function instantiates_correctly_given_dependencies()
+    public function it_returns_an_empty_array_if_no_comments_found()
     {
-        $this->assertInstanceOf('App\Services\YoutubeCommentService', $this->service);
+        $results = $this->service->request('abc123');
+        $this->assertInternalType('array', $results);
+        $this->assertEmpty($results);
     }
 
     /** @test */
-    public function sets_properties_when_given_a_typical_google_response()
+    public function it_returns_an_array_of_comments_when_given_a_typical_google_response()
     {
-        $result = (object) array(
+        $this->createMockResponse();
+
+        $results = $this->service->request('abc123');
+
+        $this->assertInstanceOf('App\Models\Comment', $results[0]);
+        $this->assertEquals('Test text', $results[0]->getText());
+        $this->assertEquals('John Doe', $results[0]->getAuthor());
+        $this->assertEquals('http://www.example.com/image.jpg', $results[0]->getAuthorProfileImageUrl());
+        $this->assertEquals('token_response', $this->service->getNextPageToken());
+        $this->assertEquals(1, $this->service->getCommentsSearched());
+    }
+
+    /** @test */
+    public function it_returns_a_next_page_token_after_a_request()
+    {
+        $this->createMockResponse();
+
+        $results = $this->service->request('abc123');
+
+        $this->assertEquals('token_response', $this->service->getNextPageToken());
+    }
+
+    /** @test */
+    public function it_returns_a_count_of_comments_searches_after_a_request()
+    {
+        $this->createMockResponse();
+
+        $results = $this->service->request('abc123');
+
+        $this->assertEquals(1, $this->service->getCommentsSearched());
+    }
+
+    protected function createMockResponse()
+    {
+        $response = (object) array(
             'nextPageToken' => 'token_response',
             'items' => (object) array(
                 (object) array(
@@ -46,27 +79,8 @@ class YoutubeCommentServiceTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->stub->method('comments')
-             ->willReturn($result);
-
-        $this->assertInstanceOf('App\Models\Comment', $this->service->fetchComments('id', 'token')[0]);
-        $this->assertEquals('Test text', $this->service->getComments()[0]->getText());
-        $this->assertEquals('John Doe', $this->service->getComments()[0]->getAuthor());
-        $this->assertEquals('http://www.example.com/image.jpg', $this->service->getComments()[0]->getAuthorProfileImageUrl());
-        $this->assertEquals('token_response', $this->service->getNextPageToken());
-        $this->assertEquals(1, $this->service->getCommentsSearched());
-    }
-
-    /** @test */
-    public function returns_empty_array_if_response_has_no_comments()
-    {
-        $result = array('test');
-
-        $this->stub->method('comments')
-             ->willReturn($result);
-
-        $this->assertEquals(array(), $this->service->getComments('id', 'token'));
-        $this->assertNull($this->service->getNextPageToken());
-        $this->assertEquals(0, $this->service->getCommentsSearched());
+        $this->stub->commentThreads->expects($this->any())
+            ->method('listCommentThreads')
+            ->willReturn($response);
     }
 }
