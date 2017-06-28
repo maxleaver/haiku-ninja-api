@@ -10,10 +10,6 @@ define('PROJECT_ROOT', realpath(__DIR__ . '/..'));
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Load env variables
-$dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
-$dotenv->load();
-
 require __DIR__ . '/../tests/LocalWebTestCase.php';
 
 /* End of file bootstrap.php */

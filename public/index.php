@@ -12,9 +12,8 @@ if (PHP_SAPI == 'cli-server') {
 require __DIR__ . '/../vendor/autoload.php';
 session_start();
 
-// Load env variables
-$dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
-$dotenv->load();
+// Anything that needs to be setup before we instantiate the app
+require __DIR__ . '/../app/bootstrap.php';
 
 // Instantiate the app
 $settings = require __DIR__ . '/../app/settings.php';
