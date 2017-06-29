@@ -16,7 +16,7 @@
         "slim/slim": "^3.1",
         "slim/php-view": "^2.0",
         "monolog/monolog": "^1.17",
-        "maxleaver/php-haiku": "1.*",
+        "maxleaver/php-haiku": "^1.1",
         "google/apiclient": "^2.0",
         "vlucas/phpdotenv": "^2.4"
     },

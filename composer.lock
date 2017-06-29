@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "da545fd23c4f123f060eb7d9f544498a",
+    "content-hash": "6498e5ae1e4440c11247eca2536fb6af",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -455,16 +455,16 @@
         },
         {
             "name": "maxleaver/php-haiku",
-            "version": "1.1",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maxleaver/php-haiku.git",
-                "reference": "0530a925b227f57d8a6fdd086ee480459d270989"
+                "reference": "3225140061d4a1cfd83cf9985a68797d0df49014"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maxleaver/php-haiku/zipball/0530a925b227f57d8a6fdd086ee480459d270989",
-                "reference": "0530a925b227f57d8a6fdd086ee480459d270989",
+                "url": "https://api.github.com/repos/maxleaver/php-haiku/zipball/3225140061d4a1cfd83cf9985a68797d0df49014",
+                "reference": "3225140061d4a1cfd83cf9985a68797d0df49014",
                 "shasum": ""
             },
             "require": {
@@ -497,7 +497,7 @@
                 "php",
                 "poetry"
             ],
-            "time": "2017-02-14T21:16:40+00:00"
+            "time": "2017-06-29T18:02:29+00:00"
         },
         {
             "name": "monolog/monolog",
