@@ -151,8 +151,7 @@ class Comment
      */
     protected function buildHaiku()
     {
-        $haiku = new Haiku();
-        $haiku->setText($this->text);
+        $haiku = new Haiku($this->text);
 
         $this->setIsHaiku($haiku->isHaiku());
 
