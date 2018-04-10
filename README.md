@@ -1,6 +1,6 @@
 # Haiku Ninja Backend API
 
-Backend API for retrieving haiku from social media comments.
+Backend API for retrieving haiku from social media comments. The frontend project is [here](https://github.com/maxleaver/haiku-ninja-frontend)
 
 ## Installation
 
